@@ -1,5 +1,8 @@
 export class BooleanCalculator {
   public calculate(expression: string): boolean {
-    return true;
+    if (expression !== "TRUE" && expression !== "FALSE") {
+      throw new Error("Invalid entry");
+    }
+    return expression === "TRUE";
   }
 }
