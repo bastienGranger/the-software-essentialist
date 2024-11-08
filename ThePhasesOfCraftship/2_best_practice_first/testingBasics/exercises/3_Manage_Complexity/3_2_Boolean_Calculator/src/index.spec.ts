@@ -61,6 +61,25 @@ describe("boolean calculator", () => {
         expect(booleanCalculator.calculate(expression)).toBe(expected);
       },
     );
+
+    it.each`
+      expression
+      ${"AND TRUE TRUE"}
+      ${"AND TRUE FALSE"}
+      ${"AND FALSE TRUE"}
+      ${"AND FALSE FALSE"}
+      ${"TRUE AND"}
+      ${"TRUE FALSE AND"}
+      ${"FALSE TRUE AND"}
+      ${"FALSE FALSE AND"}
+    `(
+      "should know that $expression is an invalid entry",
+      ({ expression, expected }) => {
+        expect(() => booleanCalculator.calculate(expression)).toThrow(
+          "Invalid entry",
+        );
+      },
+    );
   });
 
   describe("given an entry with 2 booleans and the OR operator", () => {
@@ -74,6 +93,25 @@ describe("boolean calculator", () => {
       "should know that $expression is $expected",
       ({ expression, expected }) => {
         expect(booleanCalculator.calculate(expression)).toBe(expected);
+      },
+    );
+
+    it.each`
+      expression
+      ${"OR TRUE TRUE"}
+      ${"OR TRUE FALSE"}
+      ${"OR FALSE TRUE"}
+      ${"OR FALSE FALSE"}
+      ${"TRUE OR"}
+      ${"TRUE FALSE OR"}
+      ${"FALSE TRUE OR"}
+      ${"FALSE FALSE OR"}
+    `(
+      "should know that $expression is an invalid entry",
+      ({ expression, expected }) => {
+        expect(() => booleanCalculator.calculate(expression)).toThrow(
+          "Invalid entry",
+        );
       },
     );
   });

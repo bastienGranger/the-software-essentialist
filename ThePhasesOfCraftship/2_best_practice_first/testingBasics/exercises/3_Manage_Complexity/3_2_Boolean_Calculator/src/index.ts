@@ -1,50 +1,38 @@
 export class BooleanCalculator {
-  public calculate(expression: string): boolean {
-    const expressionParts = expression.split(" ").map((part) => part.trim());
+  calculate(expression: string): boolean {
+    const andResult = this.evaluateAnd(expression);
+    const orResult = this.evaluateOr(andResult);
+    const result = this.evaluateNot(orResult);
 
-    if (expressionParts.length < 1 || expressionParts.length > 3) {
-      throw new Error("Invalid entry");
+    if (result === "TRUE") {
+      return true;
     }
-
-    if (expressionParts.length === 1) {
-      return this.getBooleanValue(expressionParts[0]);
-    }
-
-    if (expressionParts.length === 2) {
-      if (expressionParts[0] !== "NOT") {
-        throw new Error("Invalid entry");
-      }
-
-      return !this.getBooleanValue(expressionParts[1]);
-    }
-
-    const first = this.getBooleanValue(expressionParts[0]);
-    const second = this.getBooleanValue(expressionParts[2]);
-
-    if (!this.isValidOperator(expressionParts[1])) {
-      throw new Error("Invalid entry");
-    }
-    return this.isAndOperator(expressionParts[1])
-      ? first && second
-      : first || second;
-  }
-
-  private getBooleanValue(str: string): boolean {
-    if (str === "TRUE" || str === "FALSE") {
-      return str === "TRUE";
+    if (result === "FALSE") {
+      return false;
     }
     throw new Error("Invalid entry");
   }
 
-  private isAndOperator(str: string): boolean {
-    return str === "AND";
+  private evaluateAnd(expression: string): string {
+    return expression.replace(
+      /\b(TRUE|FALSE)\s+\bAND\s+\b(TRUE|FALSE)/g,
+      (_, first, second) => {
+        return first === "TRUE" && second === "TRUE" ? "TRUE" : "FALSE";
+      },
+    );
+  }
+  private evaluateOr(expression: string): string {
+    return expression.replace(
+      /\b(TRUE|FALSE)\s+\bOR\s+\b(TRUE|FALSE)/g,
+      (_, first, second) => {
+        return first === "TRUE" || second === "TRUE" ? "TRUE" : "FALSE";
+      },
+    );
   }
 
-  private isOrOperator(str: string): boolean {
-    return str === "OR";
-  }
-
-  private isValidOperator(str: string): boolean {
-    return this.isAndOperator(str) || this.isOrOperator(str);
+  private evaluateNot(expression: string): string {
+    return expression.replace(/\bNOT\s+\b(TRUE|FALSE)/g, (_, value) => {
+      return value === "TRUE" ? "FALSE" : "TRUE";
+    });
   }
 }
