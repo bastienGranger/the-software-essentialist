@@ -4,11 +4,13 @@ export class BooleanCalculator {
   OR_EXP =
     /\b((?:NOT\s+)?(?:TRUE|FALSE))\s+OR\s+((?:NOT\s+)?(?:TRUE|FALSE))\b/g;
   NOT_EXP = /\bNOT\s+\b(TRUE|FALSE)/g;
+  PARENTHESIS_EXP = /\(([^()]+)\)/g;
 
   calculate(expression: string): boolean {
-    const andResult = this.reduceAnd(expression);
-    const orResult = this.evaluateOr(andResult);
-    const result = this.evaluateNot(orResult);
+    const parenthesisResult = this.reduceParenthesis(expression);
+    const andResult = this.reduceAnd(parenthesisResult);
+    const orResult = this.reduceOr(andResult);
+    const result = this.reduceNot(orResult);
 
     if (result === "TRUE") {
       return true;
@@ -19,14 +21,29 @@ export class BooleanCalculator {
     throw new Error("Invalid entry");
   }
 
+  private reduceParenthesis(expression: string): string {
+    let reducedExpression = expression;
+    while (this.PARENTHESIS_EXP.test(reducedExpression)) {
+      reducedExpression = reducedExpression.replace(
+        this.PARENTHESIS_EXP,
+        (_, innerExpression) => {
+          const result = this.reduceAnd(innerExpression);
+          return this.reduceOr(result);
+        },
+      );
+    }
+
+    return reducedExpression;
+  }
+
   private reduceAnd(expression: string): string {
     let reducedExpression = expression;
     while (this.AND_EXP.test(reducedExpression)) {
       reducedExpression = reducedExpression.replace(
         this.AND_EXP,
         (_, first, second) => {
-          const firstNotParsed = this.evaluateNot(first);
-          const secondNotParsed = this.evaluateNot(second);
+          const firstNotParsed = this.reduceNot(first);
+          const secondNotParsed = this.reduceNot(second);
           return firstNotParsed == "TRUE" && secondNotParsed === "TRUE"
             ? "TRUE"
             : "FALSE";
@@ -36,14 +53,14 @@ export class BooleanCalculator {
 
     return reducedExpression;
   }
-  private evaluateOr(expression: string): string {
+  private reduceOr(expression: string): string {
     let reducedExpression = expression;
     while (this.OR_EXP.test(reducedExpression)) {
       reducedExpression = reducedExpression.replace(
         this.OR_EXP,
         (_, first, second) => {
-          const firstNotParsed = this.evaluateNot(first);
-          const secondNotParsed = this.evaluateNot(second);
+          const firstNotParsed = this.reduceNot(first);
+          const secondNotParsed = this.reduceNot(second);
           return firstNotParsed === "TRUE" || secondNotParsed === "TRUE"
             ? "TRUE"
             : "FALSE";
@@ -54,7 +71,7 @@ export class BooleanCalculator {
     return reducedExpression;
   }
 
-  private evaluateNot(expression: string): string {
+  private reduceNot(expression: string): string {
     return expression.replace(this.NOT_EXP, (_, value) => {
       return value === "TRUE" ? "FALSE" : "TRUE";
     });

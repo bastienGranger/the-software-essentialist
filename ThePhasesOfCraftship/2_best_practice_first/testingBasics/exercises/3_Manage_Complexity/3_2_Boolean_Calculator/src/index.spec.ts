@@ -142,4 +142,21 @@ describe("boolean calculator", () => {
       },
     );
   });
+
+  describe("given an entry with parenthesis", () => {
+    it.each`
+      expression                                             | expected
+      ${"(TRUE OR TRUE OR TRUE) AND FALSE"}                  | ${false}
+      ${"NOT (TRUE AND TRUE)"}                               | ${false}
+      ${"(TRUE OR FALSE) AND NOT (TRUE OR TRUE)"}            | ${false}
+      ${"((TRUE OR FALSE) AND NOT (TRUE OR TRUE)) AND TRUE"} | ${false}
+      ${"(FALSE AND NOT (TRUE OR TRUE)) AND TRUE"}           | ${false}
+      ${"(TRUE AND NOT (FALSE OR FALSE)) AND TRUE"}          | ${true}
+    `(
+      "should know that $expression is $expected",
+      ({ expression, expected }) => {
+        expect(booleanCalculator.calculate(expression)).toBe(expected);
+      },
+    );
+  });
 });
