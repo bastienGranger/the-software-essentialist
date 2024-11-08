@@ -18,10 +18,6 @@ export class BooleanCalculator {
       return !this.getBooleanValue(expressionParts[1]);
     }
 
-    if (expressionParts.length % 2 === 0) {
-      throw new Error("Invalid entry");
-    }
-
     const first = this.getBooleanValue(expressionParts[0]);
     const second = this.getBooleanValue(expressionParts[2]);
 
