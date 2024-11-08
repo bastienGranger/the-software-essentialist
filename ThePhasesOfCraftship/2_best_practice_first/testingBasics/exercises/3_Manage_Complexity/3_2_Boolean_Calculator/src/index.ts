@@ -10,6 +10,14 @@ export class BooleanCalculator {
       return this.getBooleanValue(expressionParts[0]);
     }
 
+    if (expressionParts.length === 2) {
+      if (expressionParts[0] !== "NOT") {
+        throw new Error("Invalid entry");
+      }
+
+      return !this.getBooleanValue(expressionParts[1]);
+    }
+
     if (expressionParts.length % 2 === 0) {
       throw new Error("Invalid entry");
     }

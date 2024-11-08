@@ -34,6 +34,14 @@ describe("boolean calculator", () => {
     expect(booleanCalculator.calculate("FALSE")).toBe(false);
   });
 
+  it("should know that NOT TRUE is false", () => {
+    expect(booleanCalculator.calculate("NOT TRUE")).toBe(false);
+  });
+
+  it("should know that NOT FALSE is true", () => {
+    expect(booleanCalculator.calculate("NOT FALSE")).toBe(true);
+  });
+
   describe("given an entry with 2 booleans and the AND operator", () => {
     it.each`
       expression           | expected
