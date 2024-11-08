@@ -115,4 +115,22 @@ describe("boolean calculator", () => {
       },
     );
   });
+
+  describe("given an entry with many booleans and the many operators", () => {
+    it.each`
+      expression                   | expected
+      ${"TRUE AND TRUE AND TRUE"}  | ${true}
+      ${"TRUE AND TRUE AND FALSE"} | ${false}
+      ${"TRUE OR TRUE OR TRUE"}    | ${true}
+      ${"TRUE OR TRUE OR FALSE"}   | ${true}
+      ${"TRUE OR FALSE AND FALSE"} | ${true}
+      ${"TRUE AND FALSE AND TRUE"} | ${false}
+      ${"TRUE AND FALSE OR TRUE"}  | ${true}
+    `(
+      "should know that $expression is $expected",
+      ({ expression, expected }) => {
+        expect(booleanCalculator.calculate(expression)).toBe(expected);
+      },
+    );
+  });
 });
