@@ -50,11 +50,16 @@ describe("boolean calculator", () => {
 
   describe("given an entry with 2 booleans and the AND operator", () => {
     it.each`
-      expression           | expected
-      ${"TRUE AND TRUE"}   | ${true}
-      ${"TRUE AND FALSE"}  | ${false}
-      ${"FALSE AND TRUE"}  | ${false}
-      ${"FALSE AND FALSE"} | ${false}
+      expression                   | expected
+      ${"TRUE AND TRUE"}           | ${true}
+      ${"TRUE AND FALSE"}          | ${false}
+      ${"FALSE AND TRUE"}          | ${false}
+      ${"FALSE AND FALSE"}         | ${false}
+      ${"TRUE AND NOT FALSE"}      | ${true}
+      ${"NOT TRUE AND TRUE"}       | ${false}
+      ${"NOT TRUE AND NOT TRUE"}   | ${false}
+      ${"NOT FALSE AND NOT FALSE"} | ${true}
+      ${"NOT FALSE AND TRUE"}      | ${true}
     `(
       "should know that $expression is $expected",
       ({ expression, expected }) => {
@@ -84,11 +89,15 @@ describe("boolean calculator", () => {
 
   describe("given an entry with 2 booleans and the OR operator", () => {
     it.each`
-      expression          | expected
-      ${"TRUE OR TRUE"}   | ${true}
-      ${"TRUE OR FALSE"}  | ${true}
-      ${"FALSE OR TRUE"}  | ${true}
-      ${"FALSE OR FALSE"} | ${false}
+      expression                  | expected
+      ${"TRUE OR TRUE"}           | ${true}
+      ${"TRUE OR FALSE"}          | ${true}
+      ${"FALSE OR TRUE"}          | ${true}
+      ${"TRUE OR NOT FALSE"}      | ${true}
+      ${"NOT TRUE OR TRUE"}       | ${true}
+      ${"NOT TRUE OR NOT TRUE"}   | ${false}
+      ${"NOT FALSE OR NOT FALSE"} | ${true}
+      ${"NOT FALSE OR TRUE"}      | ${true}
     `(
       "should know that $expression is $expected",
       ({ expression, expected }) => {

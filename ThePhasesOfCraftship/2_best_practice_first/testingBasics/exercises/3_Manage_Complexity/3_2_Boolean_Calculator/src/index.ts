@@ -1,6 +1,8 @@
 export class BooleanCalculator {
-  AND_EXP = /\b(TRUE|FALSE)\s+\bAND\s+\b(TRUE|FALSE)/g;
-  OR_EXP = /\b(TRUE|FALSE)\s+\bOR\s+\b(TRUE|FALSE)/g;
+  AND_EXP =
+    /\b((?:NOT\s+)?(?:TRUE|FALSE))\s+AND\s+((?:NOT\s+)?(?:TRUE|FALSE))\b/g;
+  OR_EXP =
+    /\b((?:NOT\s+)?(?:TRUE|FALSE))\s+OR\s+((?:NOT\s+)?(?:TRUE|FALSE))\b/g;
   NOT_EXP = /\bNOT\s+\b(TRUE|FALSE)/g;
 
   calculate(expression: string): boolean {
@@ -23,7 +25,11 @@ export class BooleanCalculator {
       reducedExpression = reducedExpression.replace(
         this.AND_EXP,
         (_, first, second) => {
-          return first === "TRUE" && second === "TRUE" ? "TRUE" : "FALSE";
+          const firstNotParsed = this.evaluateNot(first);
+          const secondNotParsed = this.evaluateNot(second);
+          return firstNotParsed == "TRUE" && secondNotParsed === "TRUE"
+            ? "TRUE"
+            : "FALSE";
         },
       );
     }
@@ -36,7 +42,11 @@ export class BooleanCalculator {
       reducedExpression = reducedExpression.replace(
         this.OR_EXP,
         (_, first, second) => {
-          return first === "TRUE" || second === "TRUE" ? "TRUE" : "FALSE";
+          const firstNotParsed = this.evaluateNot(first);
+          const secondNotParsed = this.evaluateNot(second);
+          return firstNotParsed === "TRUE" || secondNotParsed === "TRUE"
+            ? "TRUE"
+            : "FALSE";
         },
       );
     }
