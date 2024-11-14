@@ -1,11 +1,15 @@
 import { Request, Response, Router } from "express";
-import { prisma } from "../database";
+import { AssignmentService } from "../assignment/assignment.service";
 import { isMissingKeys, isUUID, parseForResponse } from "../utils";
+import { ClassService } from "./class.service";
 
 export class ClassController {
   private _router: Router;
 
-  constructor() {
+  constructor(
+    private readonly classService: ClassService,
+    private readonly assignmentService: AssignmentService,
+  ) {
     this._router = Router();
     this._router.post("/", this.createClass.bind(this));
     this._router.get(
@@ -30,11 +34,7 @@ export class ClassController {
 
       const { name } = req.body;
 
-      const cls = await prisma.class.create({
-        data: {
-          name,
-        },
-      });
+      const cls = await this.classService.createClass(name);
 
       res
         .status(201)
@@ -58,11 +58,7 @@ export class ClassController {
       }
 
       // check if class exists
-      const cls = await prisma.class.findUnique({
-        where: {
-          id,
-        },
-      });
+      const cls = await this.classService.getClassById(id);
 
       if (!cls) {
         return res.status(404).json({
@@ -72,14 +68,8 @@ export class ClassController {
         });
       }
 
-      const assignments = await prisma.assignment.findMany({
-        where: {
-          classId: id,
-        },
-        include: {
-          class: true,
-          studentTasks: true,
-        },
+      const assignments = await this.assignmentService.getAssignments({
+        classId: id,
       });
 
       res.status(200).json({

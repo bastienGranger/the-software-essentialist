@@ -1,14 +1,14 @@
 import { Request, Response, Router } from "express";
-import { prisma } from "../database";
 import { isMissingKeys, isUUID, parseForResponse } from "../utils";
+import { StudentService } from "./student.service";
 
 export class StudentController {
   private _router: Router;
 
-  constructor() {
+  constructor(private studentService: StudentService) {
     this._router = Router();
     this._router.post("/", this.createStudent.bind(this));
-    this._router.get("/", this.getStudents.bind(this));
+    this._router.get("/", this.getAllStudents.bind(this));
     this._router.get("/:id", this.getStudentById.bind(this));
     this._router.get("/:id/assignments", this.getStudentAssignments.bind(this));
     this._router.get("/:id/grades", this.getStudentGrades.bind(this));
@@ -29,11 +29,7 @@ export class StudentController {
 
       const { name } = req.body;
 
-      const student = await prisma.student.create({
-        data: {
-          name,
-        },
-      });
+      const student = await this.studentService.createStudent(name);
 
       res.status(201).json({
         error: undefined,
@@ -47,18 +43,9 @@ export class StudentController {
     }
   }
 
-  private async getStudents(req: Request, res: Response) {
+  private async getAllStudents(req: Request, res: Response) {
     try {
-      const students = await prisma.student.findMany({
-        include: {
-          classes: true,
-          assignments: true,
-          reportCards: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-      });
+      const students = await this.studentService.getAllStudents();
       res.status(200).json({
         error: undefined,
         data: parseForResponse(students),
@@ -81,17 +68,7 @@ export class StudentController {
           success: false,
         });
       }
-      const student = await prisma.student.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          classes: true,
-          assignments: true,
-          reportCards: true,
-        },
-      });
-
+      const student = this.studentService.getStudentById(id);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -124,12 +101,7 @@ export class StudentController {
       }
 
       // check if student exists
-      const student = await prisma.student.findUnique({
-        where: {
-          id,
-        },
-      });
-
+      const student = await this.studentService.getStudentById(id);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -138,16 +110,8 @@ export class StudentController {
         });
       }
 
-      const studentAssignments = await prisma.studentAssignment.findMany({
-        where: {
-          studentId: id,
-          status: "submitted",
-        },
-        include: {
-          assignment: true,
-        },
-      });
-
+      const studentAssignments =
+        await this.studentService.getStudentAssignments(student.id);
       res.status(200).json({
         error: undefined,
         data: parseForResponse(studentAssignments),
@@ -172,12 +136,7 @@ export class StudentController {
       }
 
       // check if student exists
-      const student = await prisma.student.findUnique({
-        where: {
-          id,
-        },
-      });
-
+      const student = await this.studentService.getStudentById(id);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -186,18 +145,13 @@ export class StudentController {
         });
       }
 
-      const studentAssignments = await prisma.studentAssignment.findMany({
-        where: {
-          studentId: id,
+      const studentAssignments =
+        await this.studentService.getStudentAssignments(student.id, {
           status: "submitted",
           grade: {
             not: null,
           },
-        },
-        include: {
-          assignment: true,
-        },
-      });
+        });
 
       res.status(200).json({
         error: undefined,

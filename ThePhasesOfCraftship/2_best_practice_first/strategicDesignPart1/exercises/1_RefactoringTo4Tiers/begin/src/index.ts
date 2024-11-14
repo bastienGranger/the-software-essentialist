@@ -1,18 +1,26 @@
 import express, { Request, Response } from "express";
 import { prisma } from "./database";
-import { isMissingKeys, isUUID, parseForResponse } from "./utils";
+import { isMissingKeys, parseForResponse } from "./utils";
 import { AssignmentController } from "./assignment/assignment.controller";
+import { AssignmentService } from "./assignment/assignment.service";
 import { ClassController } from "./class/class.controller";
 import { StudentController } from "./student/student.controller";
+import { StudentService } from "./student/student.service";
+import { ClassService } from "./class/class.service";
 
 const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const assignmentController = new AssignmentController();
-const classController = new ClassController();
-const studentController = new StudentController();
+const assignmentService = new AssignmentService(prisma);
+const assignmentController = new AssignmentController(assignmentService);
+
+const classService = new ClassService(prisma);
+const classController = new ClassController(classService, assignmentService);
+
+const studentService = new StudentService(prisma);
+const studentController = new StudentController(studentService);
 
 app.use("/assignments", assignmentController.router);
 app.use("/classes", classController.router);
