@@ -1,4 +1,5 @@
-import { Class, PrismaClient } from "@prisma/client";
+import { Class } from "@prisma/client";
+import { ClassRepository } from "./class.repository";
 
 abstract class IAssigmentService {
   abstract createClass(data: { name: string }): Promise<Class>;
@@ -6,21 +7,13 @@ abstract class IAssigmentService {
 }
 
 export class ClassService implements IAssigmentService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly repository: ClassRepository) {}
 
   public async createClass({ name }: { name: string }): Promise<Class> {
-    return await this.prisma.class.create({
-      data: {
-        name,
-      },
-    });
+    return await this.repository.save(name);
   }
 
   public async getClassById(id: string): Promise<Class | null> {
-    return await this.prisma.class.findUnique({
-      where: {
-        id,
-      },
-    });
+    return await this.repository.getById(id);
   }
 }

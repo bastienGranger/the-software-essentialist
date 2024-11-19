@@ -1,4 +1,5 @@
-import { PrismaClient, Student, StudentAssignment } from "@prisma/client";
+import { Student, StudentAssignment } from "@prisma/client";
+import { StudentRepository } from "./student.repository";
 
 abstract class IStudentService {
   abstract createStudent(data: { name: string }): Promise<Student>;
@@ -14,54 +15,24 @@ abstract class IStudentService {
 }
 
 export class StudentService implements IStudentService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly repository: StudentRepository) {}
 
   public createStudent({ name }: { name: string }): Promise<Student> {
-    return this.prisma.student.create({
-      data: {
-        name,
-      },
-    });
+    return this.repository.save(name);
   }
 
-  public getAllStudents() {
-    return this.prisma.student.findMany({
-      include: {
-        classes: true,
-        assignments: true,
-        reportCards: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+  public getAllStudents(): Promise<Student[]> {
+    return this.repository.getAll();
   }
 
-  public getStudentById(id: string) {
-    return this.prisma.student.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        classes: true,
-        assignments: true,
-        reportCards: true,
-      },
-    });
+  public getStudentById(id: string): Promise<Student | null> {
+    return this.repository.getById(id);
   }
 
   public getStudentAssignments(
     id: string,
     options: { status?: "submitted"; grade?: { not: null } } = {},
-  ) {
-    return this.prisma.studentAssignment.findMany({
-      where: {
-        studentId: id,
-        ...options,
-      },
-      include: {
-        assignment: true,
-      },
-    });
+  ): Promise<StudentAssignment[]> {
+    return this.repository.getAssignments(id, options);
   }
 }

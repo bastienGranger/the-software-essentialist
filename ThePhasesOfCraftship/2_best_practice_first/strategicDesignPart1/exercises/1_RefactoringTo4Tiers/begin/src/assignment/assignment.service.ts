@@ -1,4 +1,5 @@
-import { Assignment, PrismaClient } from "@prisma/client";
+import { Assignment } from "@prisma/client";
+import { AssignmentRepository } from "./assignment.repository";
 
 abstract class IAssigmentService {
   abstract createAssignment(data: {
@@ -6,11 +7,11 @@ abstract class IAssigmentService {
     title: string;
   }): Promise<Assignment>;
   abstract getAssignmentById(id: string): Promise<Assignment | null>;
-  abstract getAssignments(options: { classId: string }): Promise<Assignment[]>;
+  abstract getAssignmentsForClass(classId: string): Promise<Assignment[]>;
 }
 
 export class AssignmentService implements IAssigmentService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly repository: AssignmentRepository) {}
 
   public async createAssignment({
     classId,
@@ -19,37 +20,17 @@ export class AssignmentService implements IAssigmentService {
     classId: string;
     title: string;
   }): Promise<Assignment> {
-    return await this.prisma.assignment.create({
-      data: {
-        classId,
-        title,
-      },
+    return await this.repository.save({
+      classId,
+      title,
     });
   }
 
   public async getAssignmentById(id: string): Promise<Assignment | null> {
-    return await this.prisma.assignment.findUnique({
-      include: {
-        class: true,
-        studentTasks: true,
-      },
-      where: {
-        id,
-      },
-    });
+    return await this.repository.getById(id);
   }
 
-  public async getAssignments(options: {
-    classId: string;
-  }): Promise<Assignment[]> {
-    return await this.prisma.assignment.findMany({
-      where: {
-        ...options,
-      },
-      include: {
-        class: true,
-        studentTasks: true,
-      },
-    });
+  public async getAssignmentsForClass(classId: string): Promise<Assignment[]> {
+    return await this.repository.getByClassId(classId);
   }
 }

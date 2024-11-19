@@ -12,10 +12,7 @@ export class ClassController {
   ) {
     this._router = Router();
     this._router.post("/", this.createClass.bind(this));
-    this._router.get(
-      "/classes/:id/assignments",
-      this.getClassAssignements.bind(this),
-    );
+    this._router.get("/:id/assignments", this.getClassAssignements.bind(this));
   }
 
   public get router() {
@@ -68,9 +65,8 @@ export class ClassController {
         });
       }
 
-      const assignments = await this.assignmentService.getAssignments({
-        classId: id,
-      });
+      const assignments =
+        await this.assignmentService.getAssignmentsForClass(id);
 
       res.status(200).json({
         error: undefined,
