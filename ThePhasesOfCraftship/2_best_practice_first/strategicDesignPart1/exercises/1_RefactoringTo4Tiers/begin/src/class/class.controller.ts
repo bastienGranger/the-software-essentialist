@@ -1,6 +1,8 @@
 import { Request, Response, Router } from "express";
+import { GetClassAssignementDTO } from "../assignment/assignment.dto";
 import { AssignmentService } from "../assignment/assignment.service";
-import { isMissingKeys, isUUID, parseForResponse } from "../utils";
+import { parseForResponse } from "../utils";
+import { CreateClassDTO, GetClassDTO } from "./class.dto";
 import { ClassService } from "./class.service";
 
 export class ClassController {
@@ -21,17 +23,8 @@ export class ClassController {
 
   private async createClass(req: Request, res: Response) {
     try {
-      if (isMissingKeys(req.body, ["name"])) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const { name } = req.body;
-
-      const cls = await this.classService.createClass(name);
+      const dto = CreateClassDTO.fromRequest(req.body);
+      const cls = await this.classService.createClass(dto);
 
       res
         .status(201)
@@ -45,17 +38,8 @@ export class ClassController {
 
   private async getClassAssignements(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      if (!isUUID(id)) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      // check if class exists
-      const cls = await this.classService.getClassById(id);
+      const dto = GetClassDTO.fromRequest(req.params);
+      const cls = await this.classService.getClassById(dto);
 
       if (!cls) {
         return res.status(404).json({
@@ -65,8 +49,9 @@ export class ClassController {
         });
       }
 
-      const assignments =
-        await this.assignmentService.getAssignmentsForClass(id);
+      const assignments = await this.assignmentService.getAssignmentsForClass(
+        GetClassAssignementDTO.fromRequest({ classId: dto.id }),
+      );
 
       res.status(200).json({
         error: undefined,

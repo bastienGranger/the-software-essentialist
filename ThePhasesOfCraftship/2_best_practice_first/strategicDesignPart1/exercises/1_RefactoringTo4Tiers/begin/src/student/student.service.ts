@@ -1,12 +1,13 @@
 import { Student, StudentAssignment } from "@prisma/client";
+import { CreateStudentDTO, GetStudentDTO } from "./student.dto";
 import { StudentRepository } from "./student.repository";
 
 abstract class IStudentService {
-  abstract createStudent(data: { name: string }): Promise<Student>;
+  abstract createStudent(dto: CreateStudentDTO): Promise<Student>;
   abstract getAllStudents(): Promise<Student[]>;
-  abstract getStudentById(id: string): Promise<Student | null>;
+  abstract getStudentById(dto: GetStudentDTO): Promise<Student | null>;
   abstract getStudentAssignments(
-    id: string,
+    dto: GetStudentDTO,
     options?: {
       status?: "submitted";
       grade?: { not: null };
@@ -17,7 +18,8 @@ abstract class IStudentService {
 export class StudentService implements IStudentService {
   constructor(private readonly repository: StudentRepository) {}
 
-  public createStudent({ name }: { name: string }): Promise<Student> {
+  public createStudent(dto: CreateStudentDTO): Promise<Student> {
+    const name = dto.name;
     return this.repository.save(name);
   }
 
@@ -25,14 +27,16 @@ export class StudentService implements IStudentService {
     return this.repository.getAll();
   }
 
-  public getStudentById(id: string): Promise<Student | null> {
+  public getStudentById(dto: GetStudentDTO): Promise<Student | null> {
+    const id = dto.id;
     return this.repository.getById(id);
   }
 
   public getStudentAssignments(
-    id: string,
+    dto: GetStudentDTO,
     options: { status?: "submitted"; grade?: { not: null } } = {},
   ): Promise<StudentAssignment[]> {
+    const id = dto.id;
     return this.repository.getAssignments(id, options);
   }
 }

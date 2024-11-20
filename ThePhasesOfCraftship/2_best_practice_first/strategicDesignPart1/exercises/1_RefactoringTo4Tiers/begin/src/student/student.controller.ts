@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
-import { isMissingKeys, isUUID, parseForResponse } from "../utils";
+import { parseForResponse } from "../utils";
+import { CreateStudentDTO, GetStudentDTO } from "./student.dto";
 import { StudentService } from "./student.service";
 
 export class StudentController {
@@ -19,17 +20,8 @@ export class StudentController {
   }
   private async createStudent(req: Request, res: Response) {
     try {
-      if (isMissingKeys(req.body, ["name"])) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const { name } = req.body;
-
-      const student = await this.studentService.createStudent(name);
+      const dto = CreateStudentDTO.fromRequest(req.body);
+      const student = await this.studentService.createStudent(dto);
 
       res.status(201).json({
         error: undefined,
@@ -60,15 +52,8 @@ export class StudentController {
 
   private async getStudentById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      if (!isUUID(id)) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-      const student = this.studentService.getStudentById(id);
+      const dto = GetStudentDTO.fromRequest(req.params);
+      const student = this.studentService.getStudentById(dto);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -91,17 +76,8 @@ export class StudentController {
 
   private async getStudentAssignments(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      if (!isUUID(id)) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      // check if student exists
-      const student = await this.studentService.getStudentById(id);
+      const dto = GetStudentDTO.fromRequest(req.params);
+      const student = await this.studentService.getStudentById(dto);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -111,7 +87,7 @@ export class StudentController {
       }
 
       const studentAssignments =
-        await this.studentService.getStudentAssignments(student.id);
+        await this.studentService.getStudentAssignments(dto);
       res.status(200).json({
         error: undefined,
         data: parseForResponse(studentAssignments),
@@ -126,17 +102,8 @@ export class StudentController {
 
   private async getStudentGrades(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      if (!isUUID(id)) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      // check if student exists
-      const student = await this.studentService.getStudentById(id);
+      const dto = GetStudentDTO.fromRequest(req.params);
+      const student = await this.studentService.getStudentById(dto);
       if (!student) {
         return res.status(404).json({
           error: "StudentNotFound",
@@ -146,7 +113,7 @@ export class StudentController {
       }
 
       const studentAssignments =
-        await this.studentService.getStudentAssignments(student.id, {
+        await this.studentService.getStudentAssignments(dto, {
           status: "submitted",
           grade: {
             not: null,

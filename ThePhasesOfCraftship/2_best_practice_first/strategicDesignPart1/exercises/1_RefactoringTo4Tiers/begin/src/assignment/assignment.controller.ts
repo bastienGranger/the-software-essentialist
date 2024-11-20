@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { isMissingKeys, isUUID, parseForResponse } from "../utils";
+import { CreateAssignmentDTO, GetAssignmentDTO } from "./assignment.dto";
 import { AssignmentService } from "./assignment.service";
 
 export class AssignmentController {
@@ -17,20 +18,8 @@ export class AssignmentController {
 
   private async createAssignment(req: Request, res: Response) {
     try {
-      if (isMissingKeys(req.body, ["classId", "title"])) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const { classId, title } = req.body;
-
-      const assignment = await this.assignmentService.createAssignment({
-        classId,
-        title,
-      });
+      const dto = CreateAssignmentDTO.fromRequest(req.body);
+      const assignment = await this.assignmentService.createAssignment(dto);
 
       res.status(201).json({
         error: undefined,
@@ -46,15 +35,8 @@ export class AssignmentController {
 
   private async getAssignmentById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      if (!isUUID(id)) {
-        return res.status(400).json({
-          error: "ValidationError",
-          data: undefined,
-          success: false,
-        });
-      }
-      const assignment = await this.assignmentService.getAssignmentById(id);
+      const dto = GetAssignmentDTO.fromRequest(req.params);
+      const assignment = await this.assignmentService.getAssignmentById(dto);
 
       if (!assignment) {
         return res.status(404).json({
