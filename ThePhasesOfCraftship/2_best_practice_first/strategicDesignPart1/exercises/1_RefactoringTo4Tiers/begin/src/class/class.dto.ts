@@ -19,6 +19,34 @@ export class CreateClassDTO {
   }
 }
 
+export class EnrollStudentToClassDTO {
+  constructor(
+    public studentId: string,
+    public classId: string,
+  ) { }
+
+  static fromRequest(body: unknown) {
+    const requiredKeys = ["studentId", "classId"];
+    const isRequestInvalid =
+      !body ||
+      typeof body !== "object" ||
+      isMissingKeys(body, requiredKeys) ||
+      !isUUID((body as any).studentId) ||
+      !isUUID((body as any).classId);
+
+    if (isRequestInvalid) {
+      throw new InvalidRequestBodyException(requiredKeys);
+    }
+
+    const { studentId, classId } = body as {
+      studentId: string;
+      classId: string;
+    };
+
+    return new EnrollStudentToClassDTO(studentId, classId);
+  }
+}
+
 export class GetClassDTO {
   constructor(public id: string) { }
 
@@ -37,5 +65,33 @@ export class GetClassDTO {
     const { id } = params as { id: string };
 
     return new GetClassDTO(id);
+  }
+}
+
+export class IsStudentEnrolledDTO {
+  constructor(
+    public studentId: string,
+    public classId: string,
+  ) { }
+
+  static fromRequest(body: unknown) {
+    const requiredKeys = ["studentId", "classId"];
+    const isRequestInvalid =
+      !body ||
+      typeof body !== "object" ||
+      isMissingKeys(body, requiredKeys) ||
+      !isUUID((body as any).studentId) ||
+      !isUUID((body as any).classId);
+
+    if (isRequestInvalid) {
+      throw new InvalidRequestBodyException(requiredKeys);
+    }
+
+    const { studentId, classId } = body as {
+      studentId: string;
+      classId: string;
+    };
+
+    return new IsStudentEnrolledDTO(studentId, classId);
   }
 }
