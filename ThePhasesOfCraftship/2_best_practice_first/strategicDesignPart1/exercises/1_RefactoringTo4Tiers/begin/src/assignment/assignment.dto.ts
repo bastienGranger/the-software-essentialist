@@ -1,10 +1,11 @@
+import { InvalidRequestBodyException } from "../error-handler";
 import { isMissingKeys, isUUID } from "../utils";
 
 export class CreateAssignmentDTO {
   constructor(
     public classId: string,
     public title: string,
-  ) {}
+  ) { }
 
   static fromRequest(body: unknown) {
     const requiredKeys = ["classId", "title"];
@@ -12,7 +13,7 @@ export class CreateAssignmentDTO {
       body && typeof body !== "object" && !isMissingKeys(body, requiredKeys);
 
     if (isRequestInvalid) {
-      throw new Error(`Invalid request: ${requiredKeys} are required`);
+      throw new InvalidRequestBodyException(requiredKeys);
     }
 
     const { classId, title } = body as { classId: string; title: string };
@@ -22,7 +23,7 @@ export class CreateAssignmentDTO {
 }
 
 export class GetAssignmentDTO {
-  constructor(public id: string) {}
+  constructor(public id: string) { }
 
   static fromRequest(params: unknown) {
     const requiredKeys = ["id"];
@@ -33,7 +34,7 @@ export class GetAssignmentDTO {
       !isUUID((params as any).id);
 
     if (isRequestInvalid) {
-      throw new Error(`Invalid request: ${requiredKeys} are required`);
+      throw new InvalidRequestBodyException(requiredKeys);
     }
 
     const { id } = params as { id: string };
@@ -43,7 +44,7 @@ export class GetAssignmentDTO {
 }
 
 export class GetClassAssignementDTO {
-  constructor(public classId: string) {}
+  constructor(public classId: string) { }
 
   static fromRequest(params: unknown) {
     const requiredKeys = ["classId"];
@@ -54,7 +55,7 @@ export class GetClassAssignementDTO {
       !isUUID((params as any).id);
 
     if (isRequestInvalid) {
-      throw new Error(`Invalid request: ${requiredKeys} are required`);
+      throw new InvalidRequestBodyException(requiredKeys);
     }
 
     const { classId } = params as { classId: string };

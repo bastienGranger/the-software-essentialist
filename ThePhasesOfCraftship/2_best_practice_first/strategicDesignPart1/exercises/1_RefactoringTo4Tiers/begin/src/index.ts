@@ -10,6 +10,7 @@ import { ClassService } from "./class/class.service";
 import { StudentRepository } from "./student/student.repository";
 import { ClassRepository } from "./class/class.repository";
 import { AssignmentRepository } from "./assignment/assignment.repository";
+import { errorHandler } from "./error-handler";
 
 const cors = require("cors");
 const app = express();
@@ -18,15 +19,22 @@ app.use(cors());
 
 const assignmentRepository = new AssignmentRepository(prisma);
 const assignmentService = new AssignmentService(assignmentRepository);
-const assignmentController = new AssignmentController(assignmentService);
+const assignmentController = new AssignmentController(
+  assignmentService,
+  errorHandler,
+);
 
 const classRepository = new ClassRepository(prisma);
 const classService = new ClassService(classRepository);
-const classController = new ClassController(classService, assignmentService);
+const classController = new ClassController(
+  classService,
+  assignmentService,
+  errorHandler,
+);
 
 const studentRepository = new StudentRepository(prisma);
 const studentService = new StudentService(studentRepository);
-const studentController = new StudentController(studentService);
+const studentController = new StudentController(studentService, errorHandler);
 
 app.use("/assignments", assignmentController.router);
 app.use("/classes", classController.router);

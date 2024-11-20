@@ -1,6 +1,7 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { GetClassAssignementDTO } from "../assignment/assignment.dto";
 import { AssignmentService } from "../assignment/assignment.service";
+import { ErrorHandler } from "../error-handler";
 import { parseForResponse } from "../utils";
 import { CreateClassDTO, GetClassDTO } from "./class.dto";
 import { ClassService } from "./class.service";
@@ -11,8 +12,10 @@ export class ClassController {
   constructor(
     private readonly classService: ClassService,
     private readonly assignmentService: AssignmentService,
+    private readonly errorHandler: ErrorHandler,
   ) {
     this._router = Router();
+    this._router.use(this.errorHandler);
     this._router.post("/", this.createClass.bind(this));
     this._router.get("/:id/assignments", this.getClassAssignements.bind(this));
   }
@@ -21,7 +24,7 @@ export class ClassController {
     return this._router;
   }
 
-  private async createClass(req: Request, res: Response) {
+  private async createClass(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = CreateClassDTO.fromRequest(req.body);
       const cls = await this.classService.createClass(dto);
@@ -30,24 +33,19 @@ export class ClassController {
         .status(201)
         .json({ error: undefined, data: parseForResponse(cls), success: true });
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "ServerError", data: undefined, success: false });
+      next(error);
     }
   }
 
-  private async getClassAssignements(req: Request, res: Response) {
+  private async getClassAssignements(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
     try {
       const dto = GetClassDTO.fromRequest(req.params);
-      const cls = await this.classService.getClassById(dto);
-
-      if (!cls) {
-        return res.status(404).json({
-          error: "ClassNotFound",
-          data: undefined,
-          success: false,
-        });
-      }
+      // This is done only to throw an error if the class does not exist
+      await this.classService.getClassById(dto);
 
       const assignments = await this.assignmentService.getAssignmentsForClass(
         GetClassAssignementDTO.fromRequest({ classId: dto.id }),
@@ -59,9 +57,7 @@ export class ClassController {
         success: true,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "ServerError", data: undefined, success: false });
+      next(error);
     }
   }
 }

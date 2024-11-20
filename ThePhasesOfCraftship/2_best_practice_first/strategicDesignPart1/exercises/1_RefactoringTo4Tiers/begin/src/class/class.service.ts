@@ -1,4 +1,5 @@
 import { Class } from "@prisma/client";
+import { ClassNotFoundException } from "../error-handler";
 import { CreateClassDTO, GetClassDTO } from "./class.dto";
 import { ClassRepository } from "./class.repository";
 
@@ -8,7 +9,7 @@ abstract class IAssigmentService {
 }
 
 export class ClassService implements IAssigmentService {
-  constructor(private readonly repository: ClassRepository) {}
+  constructor(private readonly repository: ClassRepository) { }
 
   public async createClass(dto: CreateClassDTO): Promise<Class> {
     const { name } = dto;
@@ -17,6 +18,10 @@ export class ClassService implements IAssigmentService {
 
   public async getClassById(dto: GetClassDTO): Promise<Class | null> {
     const { id } = dto;
-    return await this.repository.getById(id);
+    const cls = await this.repository.getById(id);
+    if (!cls) {
+      throw new ClassNotFoundException(id);
+    }
+    return cls;
   }
 }

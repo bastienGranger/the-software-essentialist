@@ -1,7 +1,8 @@
+import { InvalidRequestBodyException } from "../error-handler";
 import { isMissingKeys, isUUID } from "../utils";
 
 export class CreateClassDTO {
-  constructor(public name: string) {}
+  constructor(public name: string) { }
 
   static fromRequest(body: unknown) {
     const requiredKeys = ["name"];
@@ -9,7 +10,7 @@ export class CreateClassDTO {
       body && typeof body !== "object" && !isMissingKeys(body, requiredKeys);
 
     if (isRequestInvalid) {
-      throw new Error(`Invalid request: ${requiredKeys} are required`);
+      throw new InvalidRequestBodyException(requiredKeys);
     }
 
     const { name } = body as { name: string };
@@ -19,7 +20,7 @@ export class CreateClassDTO {
 }
 
 export class GetClassDTO {
-  constructor(public id: string) {}
+  constructor(public id: string) { }
 
   static fromRequest(params: unknown) {
     const requiredKeys = ["id"];
@@ -30,7 +31,7 @@ export class GetClassDTO {
       !isUUID((params as any).id);
 
     if (isRequestInvalid) {
-      throw new Error(`Invalid request: ${requiredKeys} are required`);
+      throw new InvalidRequestBodyException(requiredKeys);
     }
 
     const { id } = params as { id: string };

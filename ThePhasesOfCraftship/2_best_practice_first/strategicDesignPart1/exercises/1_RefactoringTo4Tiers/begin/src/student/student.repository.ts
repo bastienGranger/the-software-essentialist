@@ -1,7 +1,7 @@
 import { PrismaClient, Student, StudentAssignment } from "@prisma/client";
 
 export class StudentRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) { }
 
   public async save(name: string): Promise<Student> {
     return await this.prisma.student.create({

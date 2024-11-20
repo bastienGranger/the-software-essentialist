@@ -1,4 +1,5 @@
 import { Assignment } from "@prisma/client";
+import { AssignmentNotFoundException } from "../error-handler";
 import {
   CreateAssignmentDTO,
   GetClassAssignementDTO,
@@ -15,7 +16,7 @@ abstract class IAssigmentService {
 }
 
 export class AssignmentService implements IAssigmentService {
-  constructor(private readonly repository: AssignmentRepository) {}
+  constructor(private readonly repository: AssignmentRepository) { }
 
   public async createAssignment(dto: CreateAssignmentDTO): Promise<Assignment> {
     const { classId, title } = dto;
@@ -29,7 +30,12 @@ export class AssignmentService implements IAssigmentService {
     dto: GetAssignmentDTO,
   ): Promise<Assignment | null> {
     const { id } = dto;
-    return await this.repository.getById(id);
+    const assignment = await this.repository.getById(id);
+    if (!assignment) {
+      throw new AssignmentNotFoundException();
+    }
+
+    return assignment;
   }
 
   public async getAssignmentsForClass(
