@@ -1,5 +1,4 @@
-import { prisma } from "../../end/src/database";
-
+import { prisma } from "../src/database";
 
 async function seed() {
   const students = await Promise.all(
@@ -34,7 +33,6 @@ async function seed() {
     }),
   );
 
-  
   // Enroll students in classes and create student assignments with grades
   for (let i = 0; i < students.length; i++) {
     for (let j = 0; j < classes.length; j++) {
@@ -80,3 +78,4 @@ seed()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
