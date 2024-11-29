@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@prisma/client':
     specifier: ^4.16.2
-    version: 4.16.2(prisma@4.16.2)
+    version: 4.16.2(prisma@6.0.0)
   cors:
     specifier: ^2.8.5
     version: 2.8.5
@@ -20,9 +20,6 @@ dependencies:
   pg:
     specifier: ^8.11.0
     version: 8.13.1
-  prisma:
-    specifier: ^4.16.0
-    version: 4.16.2
 
 devDependencies:
   '@faker-js/faker':
@@ -76,6 +73,9 @@ devDependencies:
   prettier:
     specifier: ^2.7.1
     version: 2.8.8
+  prisma:
+    specifier: ^6.0.0
+    version: 6.0.0
   rimraf:
     specifier: ^3.0.2
     version: 3.0.2
@@ -947,7 +947,7 @@ packages:
       fastq: 1.17.1
     dev: true
 
-  /@prisma/client@4.16.2(prisma@4.16.2):
+  /@prisma/client@4.16.2(prisma@6.0.0):
     resolution: {integrity: sha512-qCoEyxv1ZrQ4bKy39GnylE8Zq31IRmm8bNhNbZx7bF2cU5aiCCnSa93J2imF88MBjn7J9eUQneNxUQVJdl/rPQ==}
     engines: {node: '>=14.17'}
     requiresBuild: true
@@ -958,17 +958,39 @@ packages:
         optional: true
     dependencies:
       '@prisma/engines-version': 4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81
-      prisma: 4.16.2
+      prisma: 6.0.0
     dev: false
+
+  /@prisma/debug@6.0.0:
+    resolution: {integrity: sha512-eUjoNThlDXdyJ1iQ2d7U6aTVwm59EwvODb5zFVNJEokNoSiQmiYWNzZIwZyDmZ+j51j42/0iTaHIJ4/aZPKFRg==}
 
   /@prisma/engines-version@4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81:
     resolution: {integrity: sha512-q617EUWfRIDTriWADZ4YiWRZXCa/WuhNgLTVd+HqWLffjMSPzyM5uOWoauX91wvQClSKZU4pzI4JJLQ9Kl62Qg==}
     dev: false
 
-  /@prisma/engines@4.16.2:
-    resolution: {integrity: sha512-vx1nxVvN4QeT/cepQce68deh/Turxy5Mr+4L4zClFuK1GlxN3+ivxfuv+ej/gvidWn1cE1uAhW7ALLNlYbRUAw==}
+  /@prisma/engines-version@5.23.0-27.5dbef10bdbfb579e07d35cc85fb1518d357cb99e:
+    resolution: {integrity: sha512-JmIds0Q2/vsOmnuTJYxY4LE+sajqjYKhLtdOT6y4imojqv5d/aeVEfbBGC74t8Be1uSp0OP8lxIj2OqoKbLsfQ==}
+
+  /@prisma/engines@6.0.0:
+    resolution: {integrity: sha512-ZZCVP3q22ifN6Ex6C8RIcTDBlRtMJS2H1ljV0knCiWNGArvvkEbE88W3uDdq/l4+UvyvHpGzdf9ZsCWSQR7ZQQ==}
     requiresBuild: true
-    dev: false
+    dependencies:
+      '@prisma/debug': 6.0.0
+      '@prisma/engines-version': 5.23.0-27.5dbef10bdbfb579e07d35cc85fb1518d357cb99e
+      '@prisma/fetch-engine': 6.0.0
+      '@prisma/get-platform': 6.0.0
+
+  /@prisma/fetch-engine@6.0.0:
+    resolution: {integrity: sha512-j2m+iO5RDPRI7SUc7sHo8wX7SA4iTkJ+18Sxch8KinQM46YiCQD1iXKN6qU79C1Fliw5Bw/qDyTHaTsa3JMerA==}
+    dependencies:
+      '@prisma/debug': 6.0.0
+      '@prisma/engines-version': 5.23.0-27.5dbef10bdbfb579e07d35cc85fb1518d357cb99e
+      '@prisma/get-platform': 6.0.0
+
+  /@prisma/get-platform@6.0.0:
+    resolution: {integrity: sha512-PS6nYyIm9g8C03E4y7LknOfdCw/t2KyEJxntMPQHQZCOUgOpF82Ma60mdlOD08w90I3fjLiZZ0+MadenR3naDQ==}
+    dependencies:
+      '@prisma/debug': 6.0.0
 
   /@protobufjs/aspromise@1.1.2:
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -4833,14 +4855,15 @@ packages:
       react-is: 18.3.1
     dev: true
 
-  /prisma@4.16.2:
-    resolution: {integrity: sha512-SYCsBvDf0/7XSJyf2cHTLjLeTLVXYfqp7pG5eEVafFLeT0u/hLFz/9W196nDRGUOo1JfPatAEb+uEnTQImQC1g==}
-    engines: {node: '>=14.17'}
+  /prisma@6.0.0:
+    resolution: {integrity: sha512-RX7KtbW7IoEByf7MR32JK1PkVYLVYFqeODTtiIX3cqekq1aKdsF3Eud4zp2sUShMLjvdb5Jow0LbUjRq5LVxPw==}
+    engines: {node: '>=18.18'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 4.16.2
-    dev: false
+      '@prisma/engines': 6.0.0
+    optionalDependencies:
+      fsevents: 2.3.3
 
   /prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
