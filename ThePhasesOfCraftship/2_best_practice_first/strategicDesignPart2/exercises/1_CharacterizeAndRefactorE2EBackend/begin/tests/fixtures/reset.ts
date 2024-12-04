@@ -1,4 +1,4 @@
-import { prisma } from "../../database";
+import { prisma } from "../../src/database";
 
 async function resetDatabase() {
   const deleteAllClassEnrollments = prisma.classEnrollment.deleteMany();
@@ -16,7 +16,7 @@ async function resetDatabase() {
       deleteAllAssignments,
     ]);
   } catch (error) {
-    console.error(error);
+    console.error(`Database clean up failed with error: ${error}`); 
   } finally {
     await prisma.$disconnect();
   }
