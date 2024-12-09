@@ -48,6 +48,7 @@ model StudentAssignment {
     status       String     @default("NOT_STARTED")
     student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
     assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+    assignmentSubmission AssignmentSubmission[]
 
     @@id([studentId, assignmentId])
 }
@@ -63,3 +64,20 @@ model ClassGradeReport {
     classId String @unique
     class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 }
+
+model AssignmentSubmission {
+    id            String  @id @default(uuid())
+    studentId     String
+    assignmentId  String
+
+  studentAssignment StudentAssignment @relation(fields: [studentId, assignmentId], references: [studentId, assignmentId], onDelete: Cascade)
+  gradedAssignment    GradedAssignment[]
+}
+
+model GradedAssignment {
+  id                     String               @id @default(uuid())
+  assignmentSubmissionId String               @unique
+  grade                  String?
+  assignmentSubmission   AssignmentSubmission @relation(fields: [assignmentSubmissionId], references: [id], onDelete: Cascade)
+}
+

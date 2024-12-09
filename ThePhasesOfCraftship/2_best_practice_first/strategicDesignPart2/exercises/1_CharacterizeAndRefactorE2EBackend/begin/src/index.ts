@@ -418,51 +418,50 @@ app.post("/student-assignments/grade", async (req: Request, res: Response) => {
       });
     }
 
-    // Check if student assignment submitted
-    // TODO: Table don't exist in the database will address this issue later
-    //const studentAssignmentSubmission =
-    //await prisma.assignmentSubmission.findFirst({
-    //where: {
-    //studentAssignmentId: studentAssignment.id,
-    //},
-    //});
+    const studentAssignmentSubmission =
+      await prisma.assignmentSubmission.findFirst({
+        where: {
+          studentId: studentId,
+          assignmentId: assignmentId
+        }
+      });
 
-    //if (!studentAssignmentSubmission) {
-    //return res.status(400).json({
-    //error: Errors.NotSubmittedError,
-    //data: undefined,
-    //success: false,
-    //});
-    //}
+    if (!studentAssignmentSubmission) {
+      return res.status(400).json({
+        error: Errors.NotSubmittedError,
+        data: undefined,
+        success: false,
+      });
+    }
 
-    //const alreadyGradedAssignment = await prisma.gradedAssignment.findFirst({
-    //where: {
-    //assignmentSubmission: {
-    //studentAssignment: {
-    //assignmentId: assignmentId,
-    //},
-    //},
-    //},
-    //});
+    const alreadyGradedAssignment = await prisma.gradedAssignment.findFirst({
+      where: {
+        assignmentSubmission: {
+          studentAssignment: {
+            assignmentId: assignmentId,
+          },
+        },
+      },
+    });
 
-    //if (alreadyGradedAssignment) {
-    //return res.status(409).json({
-    //error: Errors.AlreadyGradedAssignment,
-    //data: undefined,
-    //success: false,
-    //});
-    //}
+    if (alreadyGradedAssignment) {
+      return res.status(409).json({
+        error: Errors.AlreadyGradedAssignment,
+        data: undefined,
+        success: false,
+      });
+    }
 
-    //const studentAssignmentGrade = await prisma.gradedAssignment.create({
-    //data: {
-    //grade,
-    //assignmentSubmissionId: studentAssignmentSubmission?.id as string,
-    //},
-    //});
+    const studentAssignmentGrade = await prisma.gradedAssignment.create({
+      data: {
+        grade,
+        assignmentSubmissionId: studentAssignmentSubmission?.id as string,
+      },
+    });
 
     res.status(201).json({
       error: undefined,
-      data: parseForResponse({}),
+      data: parseForResponse(studentAssignmentGrade),
       success: true,
     });
   } catch (error) {
