@@ -422,8 +422,8 @@ app.post("/student-assignments/grade", async (req: Request, res: Response) => {
       await prisma.assignmentSubmission.findFirst({
         where: {
           studentId: studentId,
-          assignmentId: assignmentId
-        }
+          assignmentId: assignmentId,
+        },
       });
 
     if (!studentAssignmentSubmission) {
@@ -701,27 +701,26 @@ app.get("/student/:id/grades", async (req: Request, res: Response) => {
       });
     }
 
-    // TODO: Table don't exist in the database will address this issue later
-    //const gradedAssignments = await prisma.gradedAssignment.findMany({
-    //where: {
-    //assignmentSubmission: {
-    //studentAssignment: {
-    //studentId: id,
-    //},
-    //},
-    //},
-    //include: {
-    //assignmentSubmission: {
-    //include: {
-    //studentAssignment: true,
-    //},
-    //},
-    //},
-    //});
+    const gradedAssignments = await prisma.gradedAssignment.findMany({
+      where: {
+        assignmentSubmission: {
+          studentAssignment: {
+            studentId: id,
+          },
+        },
+      },
+      include: {
+        assignmentSubmission: {
+          include: {
+            studentAssignment: true,
+          },
+        },
+      },
+    });
 
     res.status(200).json({
       error: undefined,
-      data: parseForResponse({}),
+      data: parseForResponse(gradedAssignments),
       success: true,
     });
   } catch (error) {
